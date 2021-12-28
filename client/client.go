@@ -14,6 +14,7 @@ const jsonContentType = "application/json"
 var (
 	ErrorIncorrectBodyFormat = errors.New("incorrect body format")
 	ErrorSendRequest         = errors.New("couldn't send request")
+	ErrorUnknown             = errors.New("unknown error")
 )
 
 type HTTPStatusError struct {
@@ -34,6 +35,12 @@ func (e *HTTPStatusError) Status() int {
 
 func PostJson(client *http.Client, url string, body string) (err error) {
 	var js map[string]interface{}
+
+	defer func() {
+		if v := recover(); v != nil {
+			err = errors.Wrap(ErrorUnknown, err.Error())
+		}
+	}()
 
 	err = json.Unmarshal([]byte(body), &js)
 	if err != nil {
