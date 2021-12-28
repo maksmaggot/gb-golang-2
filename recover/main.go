@@ -5,15 +5,32 @@ import (
 	"time"
 )
 
-func main() {
-	go func() {
-		defer func() {
-			if v := recover(); v != nil {
-				fmt.Println("recovered: ", v)
-			}
-		}()
+type CastToFloatError struct {
+	time.Time
+}
 
-		panic("Panic-panic-panic!")
+func NewCastToFloatError(time time.Time) error {
+	return &CastToFloatError{time}
+}
+
+func (c *CastToFloatError) Error() string {
+	return fmt.Sprintf("can't cast to float, error time: %s ", c.String())
+}
+
+func main() {
+
+	defer func() {
+		if v := recover(); v != nil {
+			castErr := NewCastToFloatError(time.Now())
+			fmt.Printf("processing error: %s\n", castErr.Error())
+		}
 	}()
-	time.Sleep(time.Second)
+
+	var i interface{} = "hello"
+	f := castToFloat(i)
+	fmt.Println(f)
+}
+
+func castToFloat(i interface{}) float64 {
+	return i.(float64)
 }
