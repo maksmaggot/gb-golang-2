@@ -12,15 +12,20 @@ import (
 const jsonContentType = "application/json"
 
 var (
+	// ErrorIncorrectBodyFormat incorrect body format error
 	ErrorIncorrectBodyFormat = errors.New("incorrect body format")
-	ErrorSendRequest         = errors.New("couldn't send request")
-	ErrorUnknown             = errors.New("unknown error")
+	// ErrorSendRequest send request error
+	ErrorSendRequest = errors.New("couldn't send request")
+	// ErrorUnknown unknown error
+	ErrorUnknown = errors.New("unknown error")
 )
 
+// HTTPStatusError http error with status
 type HTTPStatusError struct {
 	status int
 }
 
+// NewHTTPStatusError constructor
 func NewHTTPStatusError(status int) error {
 	return &HTTPStatusError{status}
 }
@@ -29,11 +34,13 @@ func (e *HTTPStatusError) Error() string {
 	return fmt.Sprintf("status code: %d ", e.status)
 }
 
+// Status returns http error status
 func (e *HTTPStatusError) Status() int {
 	return e.status
 }
 
-func PostJson(client *http.Client, url string, body string) (err error) {
+// PostJSON send json to url
+func PostJSON(client *http.Client, url string, body string) (err error) {
 	var js map[string]interface{}
 
 	defer func() {
